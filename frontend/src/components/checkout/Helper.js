@@ -26,7 +26,7 @@ export default class Helper {
             //Get singleUseCustomerToken from the backend
             try {
                 const res = await axios.post(
-                    "http://localhost:8080/pay/tokens",
+                    "http://roiim-env.eba-geg58ycm.us-east-2.elasticbeanstalk.com/pay/tokens",
                     {
                         merchantRefNum: this.merchantRefNum,
                         customerId: "1bb9f051-839b-42da-9e09-0d4b8ec7e73e",
@@ -72,7 +72,7 @@ export default class Helper {
         if (result && result.paymentHandleToken && !result.customerOperation) {
             try {
                 const response = await axios.post(
-                    "http://localhost:8080/pay",
+                    "http://roiim-env.eba-geg58ycm.us-east-2.elasticbeanstalk.com/pay",
                     {
                         merchantRefNum: this.merchantRefNum,
                         paymentHandleToken: result.paymentHandleToken,
@@ -104,7 +104,7 @@ export default class Helper {
             try {
                 //pass customer Id to backend when customer waants to save card
                 const response = await axios.post(
-                    "http://localhost:8080/pay",
+                    "http://roiim-env.eba-geg58ycm.us-east-2.elasticbeanstalk.com/pay",
                     {
                         customerId: this.customerId,
                         merchantRefNum: this.merchantRefNum,
