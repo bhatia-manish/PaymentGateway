@@ -1,11 +1,11 @@
 import React, {Component} from "react";
 import FormControl from "@material-ui/core/FormControl";
-// import withContext from "../../withContext";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import config from "../../paysafe.json";
-// import { validateInput } from "./Validation";
+import {validateInput} from "./Validation";
 import Helper from "./Helper";
+
 
 class Checkout extends Component {
     constructor(props) {
@@ -35,6 +35,7 @@ class Checkout extends Component {
 
     }
 
+    //initialize the paysafe sdk
     componentDidMount() {
         //including Paysafe SDK
         const script = document.createElement("script");
@@ -48,15 +49,14 @@ class Checkout extends Component {
             isPaymentProcessing: true,
         });
         const helper = new Helper();
-        //prepare input for passing to setup function beforehand
+        //set up payment
         const setupInput = await helper.prepareSetupInput(
             this.state.billingAddress,
             this.state.customerInfo,
             totalAmout,
             this.state.paysafeCustomerId
         );
-        //TODO handle invalid input data before sending to setup function
-        //calling paysafe checkout function
+        //paysafe checkout
         window.paysafe.checkout.setup(
             "cHVibGljLTc3NTE6Qi1xYTItMC01ZjAzMWNiZS0wLTMwMmQwMjE1MDA4OTBlZjI2MjI5NjU2M2FjY2QxY2I0YWFiNzkwMzIzZDJmZDU3MGQzMDIxNDUxMGJjZGFjZGFhNGYwM2Y1OTQ3N2VlZjEzZjJhZjVhZDEzZTMwNDQ=",
             setupInput,
@@ -64,7 +64,6 @@ class Checkout extends Component {
             helper.closeCallBack
         );
         try {
-            //check payment status when checkout.setup function finishes execution
             const status = await helper.paymentStatus;
             if (status.status === "success") {
                 console.log(status);
@@ -76,10 +75,23 @@ class Checkout extends Component {
         }
     };
 
-    //checkout using paysafe
+    //checkout using with paysafe
     handleCheckout = async (event) => {
         event.preventDefault();
-        await this.paysafeCheckOut(2000);
+        let validationError = validateInput(
+            this.state.customerInfo,
+            this.state.billingAddress
+        );
+        if (!validationError) {
+            this.setState({
+                error: "",
+            });
+            await this.paysafeCheckOut(2000);
+        } else {
+            this.setState({
+                error: validationError,
+            });
+        }
     };
 
 
@@ -102,8 +114,13 @@ class Checkout extends Component {
     render() {
         return (
             <center>
-                <h1>Customer Info</h1>
-                <form onSubmit={(event) => this.handleCheckout(event)}>
+                <h1 style={{color: "#4a54f1"}}>Customer Info</h1>
+                <form style={{
+                    fontSize: "14px",
+                    color: "#4a54f1",
+                    textAlign: "center",
+                    paddingTop: "50px",
+                }} onSubmit={(event) => this.handleCheckout(event)}>
                     <FormControl style={{width: "25%"}}>
                         <InputLabel htmlFor="firstName">First Name</InputLabel>
                         <Input
@@ -227,7 +244,7 @@ class Checkout extends Component {
                     <br/>
                     <button
                         type="submit"
-                        className="button is-primary is-medium"
+                        className="button is-success is-medium is-outlined"
                         disabled={this.state.isPaymentProcessing}
                     >
                         Proceed To Payment
